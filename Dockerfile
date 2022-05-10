@@ -5,7 +5,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install  -y vim less man wget tar git
 
 RUN apt-get install -y qemu-user
 
-RUN git clone https://github.com/jserv/shecc
+ADD . /shecc
 WORKDIR /shecc
 RUN make config ARCH=arm
 RUN make
