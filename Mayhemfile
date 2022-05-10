@@ -1,0 +1,6 @@
+project: rnshah9/mayhem-shec
+target: shecc
+
+cmds:
+  - cmd: /shecc/out/shecc @@
+    filepath: /test.c
