@@ -14,9 +14,10 @@
 
 int check_live_out(basic_block_t *bb, var_t *var)
 {
-    for (int i = 0; i < bb->live_out_idx; i++)
+    for (int i = 0; i < bb->live_out_idx; i++) {
         if (bb->live_out[i] == var)
             return 1;
+    }
     return 0;
 }
 
@@ -326,7 +327,7 @@ void reg_alloc()
                 func_t *func;
                 ph2_ir_t *ir;
                 int dest, src0, src1;
-                int i, sz, clear_reg;
+                int sz, clear_reg;
 
                 refresh(bb, insn);
 
@@ -460,7 +461,8 @@ void reg_alloc()
                         strcpy(ir->func_name, insn->rs2->var_name);
                     } else {
                         /* FIXME: Avoid outdated content in register after
-                         * storing, but causing some redundant spilling. */
+                         * storing, but causing some redundant spilling.
+                         */
                         spill_alive(bb, insn);
                         src0 = prepare_operand(bb, insn->rs1, -1);
                         src1 = prepare_operand(bb, insn->rs2, src0);
@@ -509,7 +511,7 @@ void reg_alloc()
                     is_pushing_args = 0;
                     args = 0;
 
-                    for (i = 0; i < REG_CNT; i++)
+                    for (int i = 0; i < REG_CNT; i++)
                         REGS[i].var = NULL;
 
                     break;
