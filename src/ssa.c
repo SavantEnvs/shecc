@@ -1125,8 +1125,7 @@ int eval_const_arithmetic(insn_t *insn)
         return 0;
 
     int res;
-    int l = insn->rs1->init_val;
-    int r = insn->rs2->init_val;
+    int l = insn->rs1->init_val, r = insn->rs2->init_val;
 
     switch (insn->opcode) {
     case OP_add:
@@ -1198,8 +1197,7 @@ void bb_build_reversed_rpo(fn_t *fn, basic_block_t *bb)
     if (fn->exit == bb)
         return;
 
-    basic_block_t *prev = fn->exit;
-    basic_block_t *curr = fn->exit->rpo_r_next;
+    basic_block_t *prev = fn->exit, *curr = fn->exit->rpo_r_next;
     for (; curr; curr = curr->rpo_r_next) {
         if (curr->rpo_r < bb->rpo_r) {
             prev = curr;

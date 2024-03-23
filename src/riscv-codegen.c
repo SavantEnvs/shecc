@@ -143,8 +143,7 @@ void emit_ph2_ir(ph2_ir_t *ph2_ir)
 {
     func_t *func;
     int rd = ph2_ir->dest + 10;
-    int rs1 = ph2_ir->src0 + 10;
-    int rs2 = ph2_ir->src1 + 10;
+    int rs1 = ph2_ir->src0 + 10, rs2 = ph2_ir->src1 + 10;
     int ofs;
 
     switch (ph2_ir->op) {

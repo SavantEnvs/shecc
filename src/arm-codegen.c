@@ -177,8 +177,7 @@ void emit_ph2_ir(ph2_ir_t *ph2_ir)
 {
     func_t *func;
     int rd = ph2_ir->dest;
-    int rn = ph2_ir->src0;
-    int rm = ph2_ir->src1;
+    int rn = ph2_ir->src0, rm = ph2_ir->src1;
     int ofs;
 
     switch (ph2_ir->op) {

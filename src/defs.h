@@ -150,8 +150,7 @@ typedef struct {
 typedef struct ref_block ref_block_t;
 
 struct ref_block_list {
-    ref_block_t *head;
-    ref_block_t *tail;
+    ref_block_t *head, *tail;
 };
 
 typedef struct ref_block_list ref_block_list_t;
@@ -223,8 +222,7 @@ typedef struct {
     int param_num;
     int size;
     var_t *dest;
-    var_t *src0;
-    var_t *src1;
+    var_t *src0, *src1;
 } ph1_ir_t;
 
 /* label lookup table*/
@@ -238,8 +236,7 @@ typedef struct basic_block basic_block_t;
 /* phase-2 IR definition */
 struct ph2_ir {
     opcode_t op;
-    int src0;
-    int src1;
+    int src0, src1;
     int dest;
     char func_name[MAX_VAR_LEN];
     basic_block_t *next_bb;
@@ -299,13 +296,11 @@ struct phi_operand {
 typedef struct phi_operand phi_operand_t;
 
 struct insn {
-    struct insn *next;
-    struct insn *prev;
+    struct insn *next, *prev;
     int idx;
     opcode_t opcode;
     var_t *rd;
-    var_t *rs1;
-    var_t *rs2;
+    var_t *rs1, *rs2;
     int sz;
     phi_operand_t *phi_ops;
     char str[64];
@@ -314,13 +309,11 @@ struct insn {
 typedef struct insn insn_t;
 
 typedef struct {
-    insn_t *head;
-    insn_t *tail;
+    insn_t *head, *tail;
 } insn_list_t;
 
 typedef struct {
-    ph2_ir_t *head;
-    ph2_ir_t *tail;
+    ph2_ir_t *head, *tail;
 } ph2_ir_list_t;
 
 typedef enum { NEXT, ELSE, THEN } bb_connection_type_t;
@@ -339,8 +332,7 @@ struct symbol {
 typedef struct symbol symbol_t;
 
 typedef struct {
-    symbol_t *head;
-    symbol_t *tail;
+    symbol_t *head, *tail;
 } symbol_list_t;
 
 struct basic_block {
@@ -391,8 +383,7 @@ struct fn {
 };
 
 typedef struct {
-    fn_t *head;
-    fn_t *tail;
+    fn_t *head, *tail;
 } func_list_t;
 
 typedef struct {

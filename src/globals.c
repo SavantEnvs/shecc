@@ -637,9 +637,8 @@ void error(char *msg)
     }
     diagnostic[i++] = '\n';
 
-    for (offset = start_idx; offset < source_idx; offset++) {
+    for (offset = start_idx; offset < source_idx; offset++)
         diagnostic[i++] = ' ';
-    }
 
     strcpy(diagnostic + i, "^ Error occurs here");
 
