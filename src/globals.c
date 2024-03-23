@@ -417,14 +417,13 @@ int size_var(var_t *var)
     return size;
 }
 
-/* TODO: Integrate with `func_t` */
+/* TODO: Integrate with 'func_t' */
 fn_t *add_fn()
 {
     fn_t *n = calloc(1, sizeof(fn_t));
 
     if (!FUNC_LIST.head) {
-        FUNC_LIST.head = n;
-        FUNC_LIST.tail = n;
+        FUNC_LIST.head = FUNC_LIST.tail = n;
         return n;
     }
     FUNC_LIST.tail->next = n;
@@ -522,8 +521,7 @@ void add_symbol(basic_block_t *bb, var_t *var)
 
     if (!bb->symbol_list.head) {
         sym->index = 0;
-        bb->symbol_list.head = sym;
-        bb->symbol_list.tail = sym;
+        bb->symbol_list.head = bb->symbol_list.tail = sym;
     } else {
         sym->index = bb->symbol_list.tail->index + 1;
         bb->symbol_list.tail->next = sym;

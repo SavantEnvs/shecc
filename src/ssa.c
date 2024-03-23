@@ -404,8 +404,7 @@ int insert_phi_insn(basic_block_t *bb, var_t *var)
     n->rs1 = var;
     n->rs2 = var;
     if (!head) {
-        bb->insn_list.head = n;
-        bb->insn_list.tail = n;
+        bb->insn_list.head = bb->insn_list.tail = n;
     } else {
         n->next = head;
         bb->insn_list.head = n;
@@ -423,8 +422,9 @@ void solve_phi_insertion()
             int work_list_idx = 0;
 
             for (ref_block_t *ref = var->ref_block_list.head; ref;
-                 ref = ref->next)
+                 ref = ref->next) {
                 work_list[work_list_idx++] = ref->bb;
+            }
 
             for (int i = 0; i < work_list_idx; i++) {
                 basic_block_t *bb = work_list[i];

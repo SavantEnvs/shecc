@@ -1458,12 +1458,11 @@ int read_body_assignment(char *token,
         } else if (lex_accept(T_andeq)) {
             op = OP_bit_and;
         } else if (lex_peek(T_open_bracket, NULL)) {
-            var_t *vd;
             /* dereference lvalue into function address */
             ph1_ir = add_ph1_ir(OP_read);
             ph1_ir->src0 = opstack_pop();
             ph1_ir->size = PTR_SIZE;
-            vd = require_var(parent);
+            var_t *vd = require_var(parent);
             strcpy(vd->var_name, gen_name());
             ph1_ir->dest = vd;
             opstack_push(vd);
@@ -1700,9 +1699,8 @@ int read_global_assignment(char *token);
 void eval_ternary_imm(int cond, char *token)
 {
     if (cond == 0) {
-        while (next_token != T_colon) {
+        while (next_token != T_colon)
             next_token = lex_token();
-        }
         lex_accept(T_colon);
         read_global_assignment(token);
     } else {
@@ -2566,13 +2564,11 @@ basic_block_t *read_body_statement(block_t *parent, basic_block_t *bb)
                      NULL);
         }
         while (lex_accept(T_comma)) {
-            var_t *nv;
-
             /* add sequence point at T_comma */
             perform_side_effect(parent, bb);
 
             /* multiple (partial) declarations */
-            nv = require_var(parent);
+            var_t *nv = require_var(parent);
             read_partial_var_decl(nv, var); /* partial */
             add_insn(parent, bb, OP_allocat, nv, NULL, NULL, 0, NULL);
             add_symbol(bb, nv);
