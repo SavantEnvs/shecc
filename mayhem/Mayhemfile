@@ -1,0 +1,14 @@
+project: savantenvs/shecc
+target: shecc
+
+# shecc is a self-hosting C compiler; the fuzz target is the stage-0 compiler binary fed an
+# arbitrary C source file. It exercises the full front-end + middle-end + ARM codegen + ELF
+# emission pipeline. Output ELF is written to /tmp (the image is mounted read-only during
+# coverage collection, so scratch output must NOT land under /mayhem).
+cmds:
+  - cmd: /mayhem/out/shecc -o /tmp/shecc-out.elf @@
+    filepath: /tmp/input.c
+
+testsuite:
+  - https://$MAYHEM_DOMAIN/$MAYHEM_PROJECT/$MAYHEM_TARGET/testsuite.tar
+  - file://mayhem/shecc/testsuite
