@@ -172,6 +172,10 @@ int rv_encode_J(rv_op op, rv_reg rd, int imm)
 {
     bool sign = false;
 
+    /* valid jump range: -1MB to 1MB */
+    if (imm > 1048575 || imm < -1048576)
+        fatal("Offset too large");
+
     if (imm < 0) {
         sign = true;
         imm = -imm;
