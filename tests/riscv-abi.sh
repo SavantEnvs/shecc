@@ -165,21 +165,29 @@ run_abi_test() {
     exit_code=$?
 
     # Check result
-    if [[ $exit_code -eq 0 ]]; then
+    # If the exit code is not zero or the output is not expected,
+    # set 'run_status' to "FAILED".
+    run_status="SUCCESS"
+    if [[ $exit_code -ne 0 || ( -n "$expected_output" && "$run_output" != *"$expected_output"* ) ]]; then
+        run_status="FAILED"
+    fi
+
+    if [[ $run_status == "SUCCESS" ]]; then
         if [[ "$VERBOSE_MODE" == "1" ]]; then
             echo -e "${GREEN}PASS${NC}: $test_name"
-            if [[ -n "$expected_output" && "$run_output" != *"$expected_output"* ]]; then
-                echo -e "${YELLOW}Warning: Output mismatch${NC}"
-                echo "Expected: $expected_output"
-                echo "Got: $run_output"
-            fi
         fi
         PASSED_TESTS=$((PASSED_TESTS + 1))
         update_category_stats "$category" "pass"
     else
         if [[ "$VERBOSE_MODE" == "1" ]]; then
             echo -e "${RED}FAIL${NC}: $test_name (exit code $exit_code)"
-            echo "$run_output" | sed 's/^/  /'
+            if [[ -n "$expected_output" && "$run_output" != *"$expected_output"* ]]; then
+                echo -e "${YELLOW}Warning: Output mismatch${NC}"
+                echo "Expected: $expected_output"
+                echo "Got: $run_output"
+            else
+                echo "$run_output" | sed 's/^/  /'
+            fi
         fi
         FAILED_TESTS=$((FAILED_TESTS + 1))
         update_category_stats "$category" "fail"
