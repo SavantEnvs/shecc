@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# AAPCS (ARM Architecture Procedure Call Standard) Compliance Test Suite
+# RISC-V Calling Convention Compliance Test Suite
 
 set -u
 
@@ -72,7 +72,7 @@ DYNLINK="${2:-0}"
 
 # Banner
 echo -e "${BLUE}${BOLD}========================================${NC}"
-echo -e "${BLUE}${BOLD}AAPCS Compliance Test Suite${NC}"
+echo -e "${BLUE}${BOLD}RISC-V Calling Convention Compliance Test Suite${NC}"
 echo -e "${BLUE}${BOLD}========================================${NC}"
 echo -e "Stage:       $STAGE"
 echo -e "Link Mode:   $([ "$DYNLINK" == "1" ] && echo "Dynamic" || echo "Static")"
@@ -201,7 +201,7 @@ run_abi_test() {
 # Parameter Passing Tests
 
 test_one_arg() {
-    run_abi_test "One argument (r0)" "Parameter Passing" '
+    run_abi_test "One argument (a0)" "Parameter Passing" '
 #include <stdio.h>
 int add_42(int x) { return x + 42; }
 int main() {
@@ -217,7 +217,7 @@ int main() {
 }
 
 test_two_args() {
-    run_abi_test "Two arguments (r0, r1)" "Parameter Passing" '
+    run_abi_test "Two arguments (a0, a1)" "Parameter Passing" '
 #include <stdio.h>
 int add(int a, int b) { return a + b; }
 int main() {
@@ -233,7 +233,7 @@ int main() {
 }
 
 test_four_args() {
-    run_abi_test "Four arguments (r0-r3)" "Parameter Passing" '
+    run_abi_test "Four arguments (a0-a3)" "Parameter Passing" '
 #include <stdio.h>
 int sum4(int a, int b, int c, int d) { return a + b + c + d; }
 int main() {
@@ -249,7 +249,7 @@ int main() {
 }
 
 test_five_args() {
-    run_abi_test "Five arguments (r0-r3 + stack)" "Parameter Passing" '
+    run_abi_test "Five arguments (a0-a4)" "Parameter Passing" '
 #include <stdio.h>
 int sum5(int a, int b, int c, int d, int e) { return a + b + c + d + e; }
 int main() {
@@ -265,7 +265,7 @@ int main() {
 }
 
 test_eight_args() {
-    run_abi_test "Eight arguments (stack-heavy)" "Parameter Passing" '
+    run_abi_test "Eight arguments" "Parameter Passing" '
 #include <stdio.h>
 int sum8(int a, int b, int c, int d, int e, int f, int g, int h) {
     return a + b + c + d + e + f + g + h;
@@ -289,7 +289,7 @@ test_stack_alignment_basic() {
 #include <stdio.h>
 int is_aligned(void *ptr) {
     int addr = (int)ptr;
-    return (addr & 0x7) == 0;
+    return (addr & 0xf) == 0;
 }
 int check_alignment(int a, int b) {
     int local;
@@ -311,7 +311,7 @@ test_stack_alignment_extended() {
 #include <stdio.h>
 int is_aligned(void *ptr) {
     int addr = (int)ptr;
-    return (addr & 0x7) == 0;
+    return (addr & 0xf) == 0;
 }
 int check_extended(int a, int b, int c, int d, int e, int f) {
     int local;
@@ -461,9 +461,11 @@ int dummy(int a, int b, int c, int d, int e, int f, int g, int h) {
     return a + b + c + d + e + f + g + h;
 }
 int main() {
-    int v1 = 100, v2 = 200, v3 = 300, v4 = 400;
+    int v1 = 100, v2 = 200, v3 = 300, v4 = 400,
+        v5 = 500, v6 = 600, v7 = 700, v8 = 800;
     dummy(1, 2, 3, 4, 5, 6, 7, 8);
-    if (v1 == 100 && v2 == 200 && v3 == 300 && v4 == 400) {
+    if (v1 == 100 && v2 == 200 && v3 == 300 && v4 == 400 &&
+        v5 == 500 && v6 == 600 && v7 == 700 && v8 == 800) {
         printf("PASS\n");
         return 0;
     }

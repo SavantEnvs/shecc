@@ -49,10 +49,6 @@ STAGE0_FLAGS ?= --dump-ir
 STAGE1_FLAGS ?=
 DYNLINK ?= 0
 ifeq ($(DYNLINK),1)
-    ifeq ($(ARCH),riscv)
-        # TODO: implement dynamic linking for RISC-V.
-        $(error "Dynamic linking mode is not implemented for RISC-V")
-    endif
     STAGE0_FLAGS += --dynlink
     STAGE1_FLAGS += --dynlink
 endif
@@ -108,8 +104,10 @@ check-sanitizer: $(OUT)/$(STAGE0)-sanitizer tests/driver.sh
 	$(Q)rm $(OUT)/shecc
 
 check-snapshots: $(OUT)/$(STAGE0) $(SNAPSHOTS) tests/check-snapshots.sh
+	# static linking
 	$(Q)$(foreach SNAPSHOT_ARCH, $(ARCHS), $(MAKE) distclean config check-snapshot ARCH=$(SNAPSHOT_ARCH) DYNLINK=0 --silent;)
-	$(Q)$(MAKE) distclean config check-snapshot ARCH=arm DYNLINK=1 --silent
+	# dynamic linking
+	$(Q)$(foreach SNAPSHOT_ARCH, $(ARCHS), $(MAKE) distclean config check-snapshot ARCH=$(SNAPSHOT_ARCH) DYNLINK=1 --silent;)
 	$(VECHO) "Switching backend back to %s (DYNLINK=0)\n" arm
 	$(Q)$(MAKE) distclean config ARCH=arm DYNLINK=0 --silent
 
@@ -118,24 +116,17 @@ check-snapshot: $(OUT)/$(STAGE0) tests/check-snapshots.sh
 	tests/check-snapshots.sh $(ARCH) $(DYNLINK)
 	$(VECHO) "  OK\n"
 
-# TODO: Add an ABI conformance test suite for the RISC-V architecture
 check-abi-stage0: $(OUT)/$(STAGE0)
-	$(Q)if [ "$(ARCH)" = "arm" ]; then \
-		tests/$(ARCH)-abi.sh 0 $(DYNLINK); \
-	else \
-		echo "Skip ABI compliance validation"; \
-	fi
+	tests/$(ARCH)-abi.sh 0 $(DYNLINK);
 
 check-abi-stage2: $(OUT)/$(STAGE2)
-	$(Q)if [ "$(ARCH)" = "arm" ]; then \
-		tests/$(ARCH)-abi.sh 2 $(DYNLINK); \
-	else \
-		echo "Skip ABI compliance validation"; \
-	fi
+	tests/$(ARCH)-abi.sh 2 $(DYNLINK);
 
 update-snapshots: tests/update-snapshots.sh
+	# static linking
 	$(Q)$(foreach SNAPSHOT_ARCH, $(ARCHS), $(MAKE) distclean config update-snapshot ARCH=$(SNAPSHOT_ARCH) DYNLINK=0 --silent;)
-	$(Q)$(MAKE) distclean config update-snapshot ARCH=arm DYNLINK=1 --silent
+	# dynamic linking
+	$(Q)$(foreach SNAPSHOT_ARCH, $(ARCHS), $(MAKE) distclean config update-snapshot ARCH=$(SNAPSHOT_ARCH) DYNLINK=1 --silent;)
 	$(VECHO) "Switching backend back to %s (DYNLINK=0)\n" arm
 	$(Q)$(MAKE) distclean config ARCH=arm DYNLINK=0 --silent
 
