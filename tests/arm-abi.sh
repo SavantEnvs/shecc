@@ -395,10 +395,9 @@ test_printf_multi_args() {
 #include <stdio.h>
 int main() {
     printf("Values: %d %d %d %d\n", 1, 2, 3, 4);
-    printf("PASS\n");
     return 0;
 }
-' "PASS" 1
+' "Values: 1 2 3 4" 1
 }
 
 test_strlen() {
