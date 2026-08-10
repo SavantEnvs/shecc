@@ -637,19 +637,19 @@ typedef struct {
 /* ELF header */
 typedef struct {
     char e_ident[16];
-    char e_type[2];
-    char e_machine[2];
+    short e_type;
+    short e_machine;
     int e_version;
     int e_entry;
     int e_phoff;
     int e_shoff;
     int e_flags;
-    char e_ehsize[2];
-    char e_phentsize[2];
-    char e_phnum[2];
-    char e_shentsize[2];
-    char e_shnum[2];
-    char e_shstrndx[2];
+    short e_ehsize;
+    short e_phentsize;
+    short e_phnum;
+    short e_shentsize;
+    short e_shnum;
+    short e_shstrndx;
 } elf32_hdr_t;
 
 /* ELF program header */
@@ -717,7 +717,7 @@ typedef struct {
     int st_size;
     char st_info;
     char st_other;
-    char st_shndx[2];
+    short st_shndx;
 } elf32_sym_t;
 
 /* For .rel.plt section */
