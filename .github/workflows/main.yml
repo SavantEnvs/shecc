@@ -14,6 +14,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Download dependencies
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           sudo apt-get update -q -y
           sudo apt-get install -q -y graphviz jq
@@ -23,15 +25,23 @@ jobs:
             if [ "${{ matrix.architecture }}" = "arm" ]; then
               sudo apt-get install -q -y gcc-arm-linux-gnueabihf
             else
-              EXPECTED_SHA256=8eef759d13cb71c332cb4b4faabd522918bb6d694e67a24aa7641453567ff140
-              FILE=/tmp/riscv32-glibc-ubuntu-24.04-gcc.tar.xz
+              # Use the GitHub Releases API to obtain the JSON data of the latest
+              # RISC-V toolchain archive
+              LATEST_RLS_JSON=$(curl --fail --silent --show-error -L -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/repos/riscv-collab/riscv-gnu-toolchain/releases/latest | jq '.assets | .[] | select(.name == "riscv32-glibc-ubuntu-24.04-gcc.tar.xz")')
+
+              # Retrieve SHA256 and URL
+              EXPECTED_SHA256=$(echo $LATEST_RLS_JSON | jq -r .digest | sed 's/sha256://g')
+              URL=$(echo $LATEST_RLS_JSON | jq -r .browser_download_url)
               set -eo pipefail
 
-              sudo wget -qO $FILE https://github.com/riscv-collab/riscv-gnu-toolchain/releases/download/2026.07.15/riscv32-glibc-ubuntu-24.04-gcc.tar.xz
+              # Download the toolchain archive
+              FILE=/tmp/riscv32-glibc-ubuntu-24.04-gcc.tar.xz
+              sudo wget -qO $FILE $URL
 
-              # Verify sha256
+              # Verify SHA256
               echo "$EXPECTED_SHA256 $FILE" | sha256sum -c -
 
+              # Extract the archive and add "/opt/riscv/bin" to the system path
               sudo tar Jxf $FILE -C /opt
               echo "/opt/riscv/bin" >> "$GITHUB_PATH"
             fi
