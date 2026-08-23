@@ -1,0 +1,24 @@
+project: savantenvs/shecc
+target: shecc
+
+# shecc is a self-hosting C compiler; the fuzz target is the stage-0 compiler binary fed an
+# arbitrary C source file. It exercises the full front-end + middle-end + ARM codegen + ELF
+# emission pipeline. The whole image — including /tmp and the CWD — is mounted READ-ONLY during
+# coverage collection; the ONLY writable location is /dev/shm. Writing the output ELF (and staging
+# the input) under /tmp fails EROFS, so the compiler aborts (SIGABRT) on every input -> a critical
+# run despite covering edges. Stage both the input and the output ELF under /dev/shm.
+cmds:
+  - cmd: /mayhem/out/shecc -o /dev/shm/shecc-out.elf @@
+    filepath: /dev/shm/input.c
+    env:
+      # Mayhem's mayhem-fuzz deferred fork-server start FAILS on this sanitizer CLI ("Error running
+      # your target ... try setting or increasing MFUZZ_COMPAT_LEVEL"). Smoke-testing succeeds (the
+      # binary compiles a seed fine); only the fuzz fork-server can't drive it. Level 1 disables ONLY
+      # the deferred fork-server start while KEEPING the fork server that amortises ASan startup — the
+      # same fix my_basic / parasail-aligner use. (Level 2 kills the fork server entirely -> too slow
+      # -> 0 edges; level 0/unset -> the restart-loop failure above.)
+      MFUZZ_COMPAT_LEVEL: "1"
+
+testsuite:
+  - https://$MAYHEM_DOMAIN/$MAYHEM_PROJECT/$MAYHEM_TARGET/testsuite.tar
+  - file://mayhem/shecc/testsuite
