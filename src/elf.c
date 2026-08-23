@@ -164,27 +164,19 @@ void elf_generate_header(void)
     hdr.e_ident[13] = 0;
     hdr.e_ident[14] = 0;
     hdr.e_ident[15] = 0;
-    hdr.e_type[0] = 2; /* Object file type */
-    hdr.e_type[1] = 0;
-    hdr.e_machine[0] = ELF_MACHINE; /* Instruction Set Architecture */
-    hdr.e_machine[1] = 0;
-    hdr.e_version = 1;                     /* ELF version */
-    hdr.e_entry = elf_code_start;          /* entry point */
-    hdr.e_phoff = sizeof(elf32_hdr_t);     /* program header offset */
-    hdr.e_shoff = shoff;                   /* section header offset */
-    hdr.e_flags = ELF_FLAGS;               /* flags */
-    hdr.e_ehsize[0] = sizeof(elf32_hdr_t); /* header size */
-    hdr.e_ehsize[1] = 0;
-    hdr.e_phentsize[0] = sizeof(elf32_phdr_t); /* program header size */
-    hdr.e_phentsize[1] = 0;
-    hdr.e_phnum[0] = phnum; /* number of program headers */
-    hdr.e_phnum[1] = 0;
-    hdr.e_shentsize[0] = sizeof(elf32_shdr_t); /* section header size */
-    hdr.e_shentsize[1] = 0;
-    hdr.e_shnum[0] = shnum; /* number of section headers */
-    hdr.e_shnum[1] = 0;
-    hdr.e_shstrndx[0] = shstrndx; /* section index with names */
-    hdr.e_shstrndx[1] = 0;
+    hdr.e_type = 2;                         /* Object file type */
+    hdr.e_machine = ELF_MACHINE;            /* Instruction Set Architecture */
+    hdr.e_version = 1;                      /* ELF version */
+    hdr.e_entry = elf_code_start;           /* entry point */
+    hdr.e_phoff = sizeof(elf32_hdr_t);      /* program header offset */
+    hdr.e_shoff = shoff;                    /* section header offset */
+    hdr.e_flags = ELF_FLAGS;                /* flags */
+    hdr.e_ehsize = sizeof(elf32_hdr_t);     /* header size */
+    hdr.e_phentsize = sizeof(elf32_phdr_t); /* program header size */
+    hdr.e_phnum = phnum;                    /* number of program headers */
+    hdr.e_shentsize = sizeof(elf32_shdr_t); /* section header size */
+    hdr.e_shnum = shnum;                    /* number of section headers */
+    hdr.e_shstrndx = shstrndx;              /* section index with names */
     elf_write_blk(elf_header, &hdr, sizeof(elf32_hdr_t));
 }
 

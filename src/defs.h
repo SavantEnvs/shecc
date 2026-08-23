@@ -634,48 +634,82 @@ typedef struct {
     int polluted;
 } regfile_t;
 
+/* In the ELF specification, the following data types are defined
+ * for data representation:
+ *
+ * +-------------+------+-----------+--------------------------+
+ * | Name        | Size | Alignment | Purpose                  |
+ * +-------------+------+-----------+--------------------------+
+ * | Elf32_Addr  | 4    | 4         | Unsigned program address |
+ * +-------------+------+-----------+--------------------------+
+ * | Elf32_Half  | 2    | 2         | Unsigned medium integer  |
+ * +-------------+------+-----------+--------------------------+
+ * | Elf32_Off   | 4    | 4         | Unsigned file offset     |
+ * +-------------+------+-----------+--------------------------+
+ * | Elf32_Sword | 4    | 4         | Signed large integer     |
+ * +-------------+------+-----------+--------------------------+
+ * | Elf32_Word  | 4    | 4         | Unsigned large integer   |
+ * +-------------+------+-----------+--------------------------+
+ * | unsigned    | 1    | 1         | Unsigned small integer   |
+ * | char        |      |           |                          |
+ * +-------------+------+-----------+--------------------------+
+ *
+ * However, since the current implementation doesn't support unsigned
+ * data type definitions, such as 'unsigned int', 'unsigned short' and
+ * so on, the ELF structures now are implemented using the 'signed' data
+ * type primarily.
+ * - Elf32_Addr    -> int
+ * - Elf32_Half    -> short
+ * - Elf32_Off     -> int
+ * - Elf32_Word    -> int
+ * - unsigned char -> char
+ *
+ * TODO: Use correct unsigned types for these ELF structures after
+ * the 'unsigned' specifier is supported.
+ */
+
 /* ELF header */
 typedef struct {
-    char e_ident[16];
-    char e_type[2];
-    char e_machine[2];
-    int e_version;
-    int e_entry;
-    int e_phoff;
-    int e_shoff;
-    int e_flags;
-    char e_ehsize[2];
-    char e_phentsize[2];
-    char e_phnum[2];
-    char e_shentsize[2];
-    char e_shnum[2];
-    char e_shstrndx[2];
+    char e_ident[16];  /* unsigned char [16] */
+    short e_type;      /* Elf32_Half */
+    short e_machine;   /* Elf32_Half */
+    int e_version;     /* Elf32_Word */
+    int e_entry;       /* Elf32_Addr */
+    int e_phoff;       /* Elf32_Off */
+    int e_shoff;       /* Elf32_Off */
+    int e_flags;       /* Elf32_Word */
+    short e_ehsize;    /* Elf32_Half */
+    short e_phentsize; /* Elf32_Half */
+    short e_phnum;     /* Elf32_Half */
+    short e_shentsize; /* Elf32_Half */
+    short e_shnum;     /* Elf32_Half */
+    short e_shstrndx;  /* Elf32_Half */
 } elf32_hdr_t;
 
 /* ELF program header */
 typedef struct {
-    int p_type;
-    int p_offset;
-    int p_vaddr;
-    int p_paddr;
-    int p_filesz;
-    int p_memsz;
-    int p_flags;
-    int p_align;
+    int p_type;   /* Elf32_Word */
+    int p_offset; /* Elf32_Off */
+    int p_vaddr;  /* Elf32_Addr */
+    int p_paddr;  /* Elf32_Addr */
+    int p_filesz; /* Elf32_Word */
+    int p_memsz;  /* Elf32_Word */
+    int p_flags;  /* Elf32_Word */
+    int p_align;  /* Elf32_Word */
 } elf32_phdr_t;
 
 /* ELF section header */
 typedef struct {
-    int sh_name;
-    int sh_type;
-    int sh_flags;
-    int sh_addr;
-    int sh_offset;
-    int sh_size;
-    int sh_link;
-    int sh_info;
-    int sh_addralign;
-    int sh_entsize;
+    int sh_name;      /* Elf32_Word */
+    int sh_type;      /* Elf32_Word */
+    int sh_flags;     /* Elf32_Word */
+    int sh_addr;      /* Elf32_Addr */
+    int sh_offset;    /* Elf32_Off */
+    int sh_size;      /* Elf32_Word */
+    int sh_link;      /* Elf32_Word */
+    int sh_info;      /* Elf32_Word*/
+    int sh_addralign; /* Elf32_Word */
+    int sh_entsize;   /* Elf32_Word */
 } elf32_shdr_t;
 
 /* Structures for dynamic linked program */
@@ -712,30 +746,34 @@ typedef struct {
 
 /* For .dynsym section. */
 typedef struct {
-    int st_name;
-    int st_value;
-    int st_size;
-    char st_info;
-    char st_other;
-    char st_shndx[2];
+    int st_name;    /* Elf32_Word */
+    int st_value;   /* Elf32_Addr */
+    int st_size;    /* Elf32_Word */
+    char st_info;   /* unsigned char */
+    char st_other;  /* unsigned char */
+    short st_shndx; /* Elf32_Half */
 } elf32_sym_t;
 
 /* For .rel.plt section */
 typedef struct {
-    int r_offset;
-    int r_info;
+    int r_offset; /* Elf32_Addr */
+    int r_info;   /* Elf32_Word */
 } elf32_rel_t;
 
 typedef struct {
-    int r_offset;
-    int r_info;
-    int r_addend;
+    int r_offset; /* Elf32_Addr */
+    int r_info;   /* Elf32_Word */
+    int r_addend; /* Elf32_Sword */
 } elf32_rela_t;
 
 /* For .dynamic section */
 typedef struct {
-    int d_tag;
-    int d_un;
+    int d_tag; /* Elf32_Sword */
+    int d_un;  /* union {
+                *     Elf32_Word d_val;
+                *     Elf32_Addr d_ptr;
+                * } d_un;
+                */
 } elf32_dyn_t;
 
 #define ELF32_ST_INFO(b, t) (((b) << 4) + ((t) & 0xf))
